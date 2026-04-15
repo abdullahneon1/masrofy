@@ -1,216 +1,366 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<meta name="theme-color" content="#0f0f0f"/>
+<meta name="theme-color" id="meta-theme-color" content="#0b0c10"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Masrofy"/>
 <meta name="description" content="Personal expense tracker - find your money leaks"/>
 <title>Masrofy — مصروفي</title>
+<link rel="icon" type="image/svg+xml" href="logo.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
 <style>
-:root{
-  --bg:#0f0f0f;--bg2:#161616;--bg3:#1e1e1e;--bg4:#262626;
-  --accent:#c8f55a;--accent2:#f5c542;--accent3:#f55a5a;
-  --text:#f0f0e8;--text2:#a0a098;--text3:#606058;
-  --border:#2a2a2a;--radius:14px;--radius-sm:8px;
+/* ── DARK MODE (DEFAULT) ── */
+:root {
+  --bg: #0b0c10;
+  --bg2: #16181d;
+  --bg3: #1f2228;
+  --bg4: #2a2e35;
+  --accent: #c8f55a;
+  --accent-grad: linear-gradient(135deg, #c8f55a 0%, #9bc238 100%);
+  --accent2: #f5c542;
+  --accent3: #ff5e5e;
+  --text: #ffffff;
+  --text2: #9ba1a6;
+  --text3: #6b7280;
+  --border: #23272e;
+  --radius: 24px;
+  --radius-sm: 14px;
+  --font-en: 'Outfit', sans-serif;
+  --font-ar: 'Tajawal', sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospace;overscroll-behavior:none}
-body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:relative}
 
-/* HEADER */
-.header{padding:52px 20px 16px;background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border)}
-.header-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px}
-.app-name{font-size:11px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase}
-.month-badge{font-size:11px;color:var(--accent);background:rgba(200,245,90,0.1);padding:3px 10px;border-radius:20px;border:1px solid rgba(200,245,90,0.2)}
-.total-display{font-size:36px;font-weight:600;letter-spacing:-0.02em;line-height:1}
-.total-label{font-size:11px;color:var(--text3);margin-top:4px;letter-spacing:0.1em}
+/* ── LIGHT MODE ── */
+:root[data-theme="light"] {
+  --bg: #f4f5f7;
+  --bg2: #ffffff;
+  --bg3: #eaeaef;
+  --bg4: #d5d7df;
+  --text: #111827;
+  --text2: #4b5563;
+  --text3: #8e929a;
+  --border: #e1e3e8;
+  --accent: #8bc34a; 
+  --accent-grad: linear-gradient(135deg, #bfe845 0%, #8bc34a 100%);
+  --accent3: #ef4444;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); overscroll-behavior: none; transition: background-color 0.3s, color 0.3s; }
+body { display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; position: relative; font-family: var(--font-en); }
+body.ar { font-family: var(--font-ar); }
+
+/* HEADER & TOGGLES */
+.header { padding: 24px 20px 10px; background: var(--bg); position: sticky; top: 0; z-index: 10; transition: background-color 0.3s; }
+.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.user-info { display: flex; align-items: center; gap: 10px; }
+.avatar { width: 44px; height: 44px; background: var(--bg3); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.app-name { font-size: 13px; color: var(--text2); letter-spacing: 0.05em; display: block; margin-bottom: 2px; }
+body.ar .app-name { letter-spacing: 0; font-size: 14px; }
+.month-badge { font-size: 16px; font-weight: 600; color: var(--text); }
+
+.controls-wrap { display: flex; align-items: center; gap: 8px; }
+.theme-btn { background: var(--bg3); border: none; font-size: 16px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); transition: all 0.3s; }
+.lang-toggle { display: flex; align-items: center; background: var(--bg3); border-radius: 30px; overflow: hidden; padding: 2px; }
+.lang-btn { padding: 6px 14px; font-size: 12px; font-weight: 500; font-family: var(--font-en); background: none; border: none; color: var(--text2); cursor: pointer; border-radius: 20px; transition: all 0.3s ease; }
+.lang-btn.active { background: var(--bg); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+body.ar .lang-btn { font-family: var(--font-ar); }
+
+/* HERO CARD */
+.balance-card { background: var(--accent-grad); border-radius: var(--radius); padding: 24px; position: relative; overflow: hidden; box-shadow: 0 12px 30px rgba(139, 195, 74, 0.15); margin-bottom: 8px; }
+.balance-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
+.total-label { font-size: 13px; color: rgba(0,0,0,0.6); font-weight: 500; margin-bottom: 6px; }
+.total-display { font-size: 40px; font-weight: 700; color: #0b0c10; letter-spacing: -0.02em; line-height: 1; margin-bottom: 16px; }
+.card-bottom-row { display: flex; justify-content: flex-end; align-items: flex-end; }
 
 /* SCROLL AREA */
-.scroll-area{flex:1;overflow-y:auto;padding-bottom:100px;-webkit-overflow-scrolling:touch}
+.scroll-area { flex: 1; overflow-y: auto; padding-bottom: 110px; -webkit-overflow-scrolling: touch; }
 
-/* BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:20;padding:8px 0 24px}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;background:none;border:none;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:color 0.15s}
-.nav-btn.active{color:var(--accent)}
-.nav-icon{font-size:20px;line-height:1}
+/* BOTTOM NAV (FLOATING FAB STYLE) */
+.bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--bg2); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 20; padding: 12px 10px 24px; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); transition: background-color 0.3s, border-color 0.3s; }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; background: none; border: none; color: var(--text3); font-family: var(--font-en); font-size: 11px; font-weight: 500; cursor: pointer; transition: color 0.2s; }
+body.ar .nav-btn { font-family: var(--font-ar); font-size: 12px; }
+.nav-btn.active { color: var(--text); }
+.nav-icon { font-size: 22px; line-height: 1; margin-bottom: 2px; }
 
-/* CARDS */
-.section{padding:16px 20px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
-.card-label{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+/* Center Add Button */
+.nav-btn.center-fab { position: relative; top: -24px; background: var(--accent-grad); color: #000; width: 60px; height: 60px; flex: 0 0 60px; border-radius: 50%; border: 6px solid var(--bg); box-shadow: 0 8px 24px rgba(139, 195, 74, 0.3); justify-content: center; padding: 0; margin: 0 10px; transition: border-color 0.3s; }
+.nav-btn.center-fab .nav-icon { font-size: 28px; margin: 0; font-weight: 300; }
+.nav-btn.center-fab span:not(.nav-icon) { display: none; }
 
 /* METRICS GRID */
-.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 20px 0}
-.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
-.metric-card.highlight{border-color:rgba(200,245,90,0.3);background:rgba(200,245,90,0.05)}
-.metric-card.danger{border-color:rgba(245,90,90,0.3);background:rgba(245,90,90,0.05)}
-.metric-val{font-size:20px;font-weight:600;margin-bottom:2px}
-.metric-val.green{color:var(--accent)}
-.metric-val.red{color:var(--accent3)}
-.metric-lbl{font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase}
+.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 20px 20px; }
+.metric-card { background: var(--bg2); border-radius: var(--radius-sm); padding: 18px; position: relative; overflow: hidden; transition: background-color 0.3s; border: 1px solid transparent; }
+[data-theme="light"] .metric-card { border-color: var(--border); }
+.metric-card.danger { background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); }
+.metric-val { font-size: 22px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+.metric-val.green { color: var(--accent); }
+.metric-val.red { color: var(--accent3); }
+.metric-lbl { font-size: 12px; color: var(--text2); font-weight: 500; }
+
+/* SECTION & CARDS */
+.section { padding: 10px 20px; }
+.card-label { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+body.ar .card-label { font-size: 17px; }
 
 /* ADD FORM */
-.add-form{padding:16px 20px}
-.field{margin-bottom:14px}
-.field label{display:block;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
-.field input,.field select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:15px;outline:none;transition:border-color 0.15s;-webkit-appearance:none}
-.field input:focus,.field select:focus{border-color:var(--accent)}
-.field select option{background:var(--bg3)}
-.amount-wrap{position:relative}
-.amount-wrap .currency{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px}
-.amount-wrap input{padding-left:50px}
-.add-btn{width:100%;padding:15px;background:var(--accent);color:#0f0f0f;border:none;border-radius:var(--radius);font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;letter-spacing:0.08em;cursor:pointer;transition:opacity 0.15s;margin-top:4px}
-.add-btn:active{opacity:0.8;transform:scale(0.99)}
-.success-flash{text-align:center;font-size:12px;color:var(--accent);height:20px;margin-top:8px;letter-spacing:0.1em}
+.add-form { padding: 20px; }
+.field { margin-bottom: 20px; }
+.field label { display: block; font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
+.field input, .field select { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; color: var(--text); font-family: var(--font-en); font-size: 16px; outline: none; transition: all 0.2s; -webkit-appearance: none; }
+body.ar .field input, body.ar .field select { font-family: var(--font-ar); }
+.field input:focus, .field select:focus { border-color: var(--accent); background: var(--bg3); }
+.amount-wrap { position: relative; }
+.amount-wrap .currency { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text2); font-size: 16px; font-weight: 500; }
+body.ar .amount-wrap .currency { left: auto; right: 16px; }
+.amount-wrap input { padding-left: 60px; font-size: 24px; font-weight: 600; }
+body.ar .amount-wrap input { padding-left: 16px; padding-right: 60px; }
+.add-btn { width: 100%; padding: 18px; background: var(--accent-grad); color: #0b0c10; border: none; border-radius: 100px; font-family: var(--font-en); font-size: 15px; font-weight: 600; letter-spacing: 0.05em; cursor: pointer; transition: transform 0.15s; margin-top: 10px; box-shadow: 0 8px 24px rgba(139, 195, 74, 0.2); }
+body.ar .add-btn { font-family: var(--font-ar); letter-spacing: 0; }
+.add-btn:active { transform: scale(0.97); }
+.success-flash { text-align: center; font-size: 13px; font-weight: 500; color: var(--accent); height: 20px; margin-top: 12px; }
 
 /* CAT PILLS */
-.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.cat-pill{padding:10px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:11px;text-align:center;cursor:pointer;transition:all 0.15s;color:var(--text2);line-height:1.3}
-.cat-pill.selected{background:rgba(200,245,90,0.12);border-color:var(--accent);color:var(--accent)}
-.cat-pill .cat-icon{font-size:18px;display:block;margin-bottom:3px}
+.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.cat-pill { padding: 14px 8px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; text-align: center; cursor: pointer; transition: all 0.2s; color: var(--text2); }
+:root:not([data-theme="light"]) .cat-pill { border-color: transparent; }
+.cat-pill.selected { background: rgba(139, 195, 74, 0.08); border-color: var(--accent); color: var(--accent); box-shadow: 0 4px 12px rgba(139, 195, 74, 0.05); }
+.cat-pill .cat-icon { font-size: 24px; display: block; margin-bottom: 6px; }
 
 /* EXPENSE LIST */
-.expense-item{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);animation:fadeIn 0.2s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-.exp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.exp-body{flex:1;min-width:0}
-.exp-desc{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.exp-meta{font-size:11px;color:var(--text3);margin-top:2px}
-.exp-right{text-align:right;flex-shrink:0}
-.exp-amount{font-size:15px;font-weight:500}
-.exp-delete{background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:4px 8px;margin-left:4px}
-.exp-delete:active{color:var(--accent3)}
+.expense-item { display: flex; align-items: center; gap: 14px; padding: 12px 16px; margin-bottom: 10px; background: var(--bg2); border: 1px solid transparent; border-radius: var(--radius-sm); animation: fadeIn 0.3s ease; transition: background-color 0.3s; }
+[data-theme="light"] .expense-item { border-color: var(--border); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.exp-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.exp-body { flex: 1; min-width: 0; }
+.exp-desc { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+.exp-meta { font-size: 12px; color: var(--text2); }
+.exp-right { text-align: right; flex-shrink: 0; }
+body.ar .exp-right { text-align: left; }
+.exp-amount { font-size: 16px; font-weight: 600; color: var(--text); }
+.exp-delete { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; padding: 4px; margin-left: 8px; border-radius: 50%; }
+body.ar .exp-delete { margin-left: 0; margin-right: 8px; }
+.exp-delete:active { color: var(--accent3); background: rgba(239,68,68,0.1); }
 
 /* FILTER BAR */
-.filter-bar{display:flex;gap:8px;padding:12px 20px;overflow-x:auto;scrollbar-width:none}
-.filter-bar::-webkit-scrollbar{display:none}
-.filter-chip{padding:6px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;font-size:11px;white-space:nowrap;cursor:pointer;color:var(--text2);letter-spacing:0.05em;flex-shrink:0}
-.filter-chip.active{background:rgba(200,245,90,0.12);border-color:var(--accent);color:var(--accent)}
+.filter-bar { display: flex; gap: 10px; padding: 0 20px 20px; overflow-x: auto; scrollbar-width: none; margin-top: 10px; }
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-chip { padding: 8px 18px; background: var(--bg2); border: 1px solid var(--border); border-radius: 100px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; color: var(--text2); flex-shrink: 0; transition: all 0.2s; }
+:root:not([data-theme="light"]) .filter-chip { border-color: transparent; }
+.filter-chip.active { background: var(--text); color: var(--bg); border-color: var(--text); }
 
 /* INSIGHTS */
-.leak-row{padding:12px 0;border-bottom:1px solid var(--border)}
-.leak-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
-.leak-cat{font-size:13px}
-.leak-right{text-align:right}
-.leak-pct{font-size:13px;font-weight:600}
-.leak-amt{font-size:11px;color:var(--text3);margin-top:1px}
-.leak-track{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
-.leak-fill{height:100%;border-radius:2px;transition:width 0.6s cubic-bezier(.4,0,.2,1)}
-.insight-card{background:var(--bg3);border-left:3px solid var(--accent2);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 14px;margin-bottom:10px;font-size:13px;line-height:1.6;color:var(--text2)}
-.insight-card.warn{border-left-color:var(--accent3)}
-.insight-card strong{color:var(--text)}
+.leak-row { background: var(--bg2); padding: 16px; border-radius: var(--radius-sm); margin-bottom: 10px; border: 1px solid transparent; transition: background-color 0.3s; }
+[data-theme="light"] .leak-row { border-color: var(--border); }
+.leak-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.leak-cat { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+.leak-right { text-align: right; }
+body.ar .leak-right { text-align: left; }
+.leak-pct { font-size: 15px; font-weight: 600; color: var(--text); }
+.leak-amt { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.leak-track { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+.leak-fill { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+.insight-card { background: var(--bg2); border-left: 4px solid var(--accent2); border-radius: 8px var(--radius-sm) var(--radius-sm) 8px; padding: 16px; margin-bottom: 12px; font-size: 14px; line-height: 1.6; color: var(--text2); transition: background-color 0.3s; border-top: 1px solid transparent; border-right: 1px solid transparent; border-bottom: 1px solid transparent; }
+[data-theme="light"] .insight-card { border-top-color: var(--border); border-right-color: var(--border); border-bottom-color: var(--border); }
+body.ar .insight-card { border-left: none; border-right: 4px solid var(--accent2); border-radius: var(--radius-sm) 8px 8px var(--radius-sm); }
+[data-theme="light"] body.ar .insight-card { border-top-color: var(--border); border-left-color: var(--border); border-bottom-color: var(--border); }
+.insight-card.warn { border-color: var(--accent3); }
+.insight-card strong { color: var(--text); font-weight: 600; }
 
 /* CHART BARS */
-.chart-wrap{padding:16px 20px}
-.chart-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.chart-cat-label{font-size:11px;color:var(--text2);width:80px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chart-bar-bg{flex:1;height:28px;background:var(--bg3);border-radius:4px;overflow:hidden;position:relative}
-.chart-bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:10px;font-size:11px;font-weight:500;color:#0f0f0f;transition:width 0.6s cubic-bezier(.4,0,.2,1);min-width:0}
-.chart-amt{font-size:11px;color:var(--text3);width:80px;text-align:right;flex-shrink:0}
+.chart-wrap { padding: 0 20px 20px; }
+.chart-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.chart-cat-label { font-size: 12px; font-weight: 500; color: var(--text2); width: 85px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chart-bar-bg { flex: 1; height: 12px; background: var(--bg2); border-radius: 6px; overflow: hidden; position: relative; }
+[data-theme="light"] .chart-bar-bg { border: 1px solid var(--border); }
+.chart-bar-fill { height: 100%; border-radius: 6px; transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+.chart-amt { font-size: 13px; font-weight: 600; color: var(--text); width: 75px; text-align: right; flex-shrink: 0; }
+body.ar .chart-amt { text-align: left; }
 
 /* EMPTY STATE */
-.empty{text-align:center;padding:48px 20px;color:var(--text3)}
-.empty-icon{font-size:40px;margin-bottom:12px}
-.empty-text{font-size:13px;line-height:1.7}
+.empty { text-align: center; padding: 60px 20px; color: var(--text3); }
+.empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+.empty-text { font-size: 14px; line-height: 1.6; font-weight: 500; }
 
 /* TABS */
-.page{display:none}
-.page.active{display:block}
+.page { display: none; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
 
-/* EXPORT BTN */
-.export-btn{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2);cursor:pointer;letter-spacing:0.08em;margin:0 20px 12px}
-.export-btn:active{opacity:0.7}
+/* EXPORT / IMPORT BTN ROW */
+.csv-btns { display: flex; gap: 10px; padding: 0 20px 16px; }
+.export-btn, .import-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--bg2); border: 1px solid var(--border); border-radius: 100px; padding: 12px 16px; font-family: var(--font-en); font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer; flex: 1; transition: all 0.2s; }
+body.ar .export-btn, body.ar .import-btn { font-family: var(--font-ar); }
+.export-btn:hover, .import-btn:hover { background: var(--bg3); }
+.export-btn:active, .import-btn:active { transform: scale(0.96); }
+#csv-file-input { display: none; }
+
+/* ABOUT PAGE */
+.about-page { padding: 10px 20px 40px; }
+.about-logo { width: 80px; height: 80px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; box-shadow: 0 10px 30px rgba(139, 195, 74, 0.2); overflow: hidden; }
+.about-logo img { width: 100%; height: 100%; object-fit: cover; }
+.about-app-name { text-align: center; font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.about-tagline { text-align: center; font-size: 14px; color: var(--text2); margin-bottom: 36px; }
+.about-section { margin-bottom: 32px; }
+.about-section-title { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); font-weight: 600; margin-bottom: 16px; }
+body.ar .about-section-title { letter-spacing: 0; }
+.about-text { font-size: 15px; color: var(--text2); line-height: 1.7; }
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.feature-list li { display: flex; align-items: center; gap: 12px; font-size: 15px; color: var(--text2); font-weight: 500; }
+.feature-list li::before { content: '✓'; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: rgba(139, 195, 74, 0.15); color: var(--accent); font-size: 10px; flex-shrink: 0; }
+body.ar .feature-list li { flex-direction: row-reverse; text-align: right; }
+.divider { height: 1px; background: var(--border); margin: 32px 0; }
+.neon-card { background: var(--bg2); border-radius: var(--radius); padding: 24px; text-align: center; border: 1px solid var(--border); transition: background-color 0.3s; }
+.neon-logo-text { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: 0.05em; margin-bottom: 4px; }
+.neon-sub { font-size: 12px; color: var(--accent); font-weight: 500; }
+.neon-desc { font-size: 13px; color: var(--text2); margin-top: 12px; line-height: 1.6; }
+.version-badge { display: inline-block; margin-top: 20px; padding: 6px 14px; background: var(--bg); border-radius: 100px; font-size: 12px; font-weight: 600; color: var(--text3); }
+
+/* RTL support */
+body.ar .header-top { flex-direction: row-reverse; }
+body.ar .user-info { flex-direction: row-reverse; }
+body.ar .controls-wrap { flex-direction: row-reverse; }
+body.ar .card-bottom-row { flex-direction: row-reverse; }
+body.ar .leak-top { flex-direction: row-reverse; }
+body.ar .leak-cat { flex-direction: row-reverse; }
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="header-top">
-    <span class="app-name">Masrofy · مصروفي</span>
-    <span class="month-badge" id="month-badge">Loading...</span>
+    <div class="user-info">
+      <div class="avatar"><img src="logo.svg" alt="Masrofy Logo"></div>
+      <div>
+        <span class="app-name" id="lbl-app-name">Good Morning</span>
+        <span class="month-badge" id="month-badge">Loading...</span>
+      </div>
+    </div>
+    <div class="controls-wrap">
+      <button class="theme-btn" id="btn-theme" onclick="toggleTheme()">🌙</button>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" id="btn-ar" onclick="setLang('ar')">ع</button>
+      </div>
+    </div>
   </div>
-  <div class="total-display" id="header-total">EGP 0</div>
-  <div class="total-label">THIS MONTH'S SPENDING</div>
+
+  <div class="balance-card">
+    <div class="total-label" id="lbl-this-month-spending">THIS MONTH'S SPENDING</div>
+    <div class="total-display" id="header-total">EGP 0</div>
+    <div class="card-bottom-row">
+       <div style="font-size: 24px; opacity: 0.5; color: #000;">💸</div>
+    </div>
+  </div>
 </div>
 
 <div class="scroll-area" id="scroll-area">
 
-  <!-- HOME PAGE -->
   <div class="page active" id="page-home">
     <div class="metrics">
-      <div class="metric-card highlight">
-        <div class="metric-val green" id="m-month">EGP 0</div>
-        <div class="metric-lbl">This month</div>
-      </div>
       <div class="metric-card">
         <div class="metric-val" id="m-count">0</div>
-        <div class="metric-lbl">Expenses</div>
+        <div class="metric-lbl" id="lbl-expenses">Total Expenses</div>
       </div>
       <div class="metric-card">
-        <div class="metric-val" id="m-avg">EGP 0</div>
-        <div class="metric-lbl">Daily avg</div>
-      </div>
-      <div class="metric-card danger">
-        <div class="metric-val red" id="m-top-cat">—</div>
-        <div class="metric-lbl">Top category</div>
+        <div class="metric-val green" id="m-avg">EGP 0</div>
+        <div class="metric-lbl" id="lbl-daily-avg">Daily Average</div>
       </div>
     </div>
+    
     <div class="chart-wrap" id="home-chart"></div>
+    
     <div class="section" style="padding-top:0">
-      <div class="card-label" style="padding:0 0 10px">Recent</div>
+      <div class="card-label">
+        <span id="lbl-recent">Recent Transactions</span>
+        <span style="font-size: 13px; color: var(--text2); font-weight: 500; cursor: pointer;" onclick="switchPage('list')">View All</span>
+      </div>
       <div id="recent-list"></div>
     </div>
   </div>
 
-  <!-- ADD PAGE -->
   <div class="page" id="page-add">
     <div class="add-form">
       <div class="field">
-        <label>Description</label>
+        <label id="lbl-desc">Description</label>
         <input type="text" id="f-desc" placeholder="e.g. Uber, pizza, rent..." autocomplete="off"/>
       </div>
       <div class="field">
-        <label>Amount</label>
+        <label id="lbl-amount">Amount</label>
         <div class="amount-wrap">
           <span class="currency">EGP</span>
           <input type="number" id="f-amount" placeholder="0.00" inputmode="decimal" min="0" step="0.01"/>
         </div>
       </div>
       <div class="field">
-        <label>Category</label>
+        <label id="lbl-category">Category</label>
         <div class="cat-grid" id="cat-grid"></div>
       </div>
       <div class="field">
-        <label>Date</label>
+        <label id="lbl-date">Date</label>
         <input type="date" id="f-date"/>
       </div>
-      <button class="add-btn" onclick="addExpense()">+ ADD EXPENSE</button>
+      <button class="add-btn" id="add-btn" onclick="addExpense()">+ ADD EXPENSE</button>
       <div class="success-flash" id="flash"></div>
     </div>
   </div>
 
-  <!-- LIST PAGE -->
   <div class="page" id="page-list">
     <div class="filter-bar" id="filter-bar"></div>
-    <button class="export-btn" onclick="exportCSV()">↓ EXPORT CSV</button>
-    <div id="expense-list"></div>
+    <div class="csv-btns">
+      <button class="export-btn" onclick="exportCSV()"><span style="font-size: 16px;">↓</span> <span id="lbl-export">EXPORT CSV</span></button>
+      <button class="import-btn" onclick="document.getElementById('csv-file-input').click()"><span style="font-size: 16px;">↑</span> <span id="lbl-import">IMPORT CSV</span></button>
+      <input type="file" id="csv-file-input" accept=".csv" onchange="importCSV(event)"/>
+    </div>
+    <div class="section" style="padding-top: 0;" id="expense-list"></div>
   </div>
 
-  <!-- INSIGHTS PAGE -->
   <div class="page" id="page-insights">
     <div class="section">
-      <div class="card-label">Spending breakdown</div>
+      <div class="card-label" id="lbl-spending-breakdown">Spending breakdown</div>
       <div id="leak-bars"></div>
-      <div style="margin-top:20px">
-        <div class="card-label">Money leak insights</div>
+      <div style="margin-top:28px">
+        <div class="card-label" id="lbl-money-leaks">Money leak insights</div>
         <div id="insights-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-about">
+    <div class="about-page">
+      <div class="about-logo"><img src="logo.svg" alt="Masrofy Logo"></div>
+      <div class="about-app-name" id="about-app-name">Masrofy</div>
+      <div class="about-tagline" id="about-tagline">Your personal money leak detector</div>
+
+      <div class="about-section">
+        <div class="about-section-title" id="about-what-title">What is Masrofy?</div>
+        <div class="about-text" id="about-what-text">Masrofy (مصروفي) means "my expenses" in Arabic. It's a simple, offline-first expense tracker designed to help you understand where your money actually goes — and spot the leaks before they drain you.</div>
+      </div>
+
+      <div class="about-section">
+        <div class="about-section-title" id="about-features-title">Features</div>
+        <ul class="feature-list" id="about-features">
+          <li id="feat-1">Track daily expenses by category</li>
+          <li id="feat-2">Visual spending breakdown & insights</li>
+          <li id="feat-3">Export & import data as CSV</li>
+          <li id="feat-4">Works offline — your data stays on your device</li>
+          <li id="feat-5">Arabic & English language support</li>
+          <li id="feat-6">Installable as a mobile app (PWA)</li>
+        </ul>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="neon-card">
+        <div class="neon-logo-text">NEON STUDIOS</div>
+        <div class="neon-sub" id="neon-sub">Built with craft & curiosity</div>
+        <div class="neon-desc" id="neon-desc">Masrofy is a product of Neon Studios — a creative digital studio focused on building tools that are purposeful, beautiful, and fast.</div>
+        <div class="version-badge">v2.0.0 · 2025</div>
       </div>
     </div>
   </div>
@@ -219,67 +369,232 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
 
 <nav class="bottom-nav">
   <button class="nav-btn active" id="nav-home" onclick="switchPage('home')">
-    <span class="nav-icon">⌂</span>Home
-  </button>
-  <button class="nav-btn" id="nav-add" onclick="switchPage('add')">
-    <span class="nav-icon" style="font-size:26px;color:var(--accent)">+</span>Add
-  </button>
-  <button class="nav-btn" id="nav-list" onclick="switchPage('list')">
-    <span class="nav-icon">≡</span>Expenses
+    <span class="nav-icon">⌂</span><span id="nav-lbl-home">Home</span>
   </button>
   <button class="nav-btn" id="nav-insights" onclick="switchPage('insights')">
-    <span class="nav-icon">◎</span>Insights
+    <span class="nav-icon">📊</span><span id="nav-lbl-insights">Insights</span>
+  </button>
+  
+  <button class="nav-btn center-fab" id="nav-add" onclick="switchPage('add')">
+    <span class="nav-icon">+</span><span id="nav-lbl-add">Add</span>
+  </button>
+  
+  <button class="nav-btn" id="nav-list" onclick="switchPage('list')">
+    <span class="nav-icon">≡</span><span id="nav-lbl-list">History</span>
+  </button>
+  <button class="nav-btn" id="nav-about" onclick="switchPage('about')">
+    <span class="nav-icon">ℹ</span><span id="nav-lbl-about">Menu</span>
   </button>
 </nav>
 
 <script>
+// ── THEME (DARK / LIGHT MODE) ────────────────────────────────
+let currentTheme = localStorage.getItem('masrofy-theme') || 'dark';
+
+function applyTheme(t) {
+  currentTheme = t;
+  localStorage.setItem('masrofy-theme', t);
+  
+  if (t === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.getElementById('btn-theme').textContent = '☀️';
+    document.getElementById('meta-theme-color').setAttribute('content', '#f4f5f7');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    document.getElementById('btn-theme').textContent = '🌙';
+    document.getElementById('meta-theme-color').setAttribute('content', '#0b0c10');
+  }
+}
+
+function toggleTheme() {
+  applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+}
+
+// ── CATEGORIES ──────────────────────────────────────────────
 const CATS=[
-  {name:'Food',icon:'🍔',color:'#f55a5a'},
-  {name:'Transport',icon:'🚗',color:'#5a9ef5'},
-  {name:'Shopping',icon:'🛍️',color:'#d45af5'},
-  {name:'Entertainment',icon:'🎮',color:'#7f77dd'},
-  {name:'Bills',icon:'⚡',color:'#f5c542'},
-  {name:'Health',icon:'💊',color:'#5af5a0'},
-  {name:'Education',icon:'📚',color:'#5addf5'},
-  {name:'Housing',icon:'🏠',color:'#f5955a'},
-  {name:'Other',icon:'📌',color:'#a0a098'}
+  {name:'Food',    nameAr:'طعام',     icon:'🍔', color:'#ef4444'},
+  {name:'Transport',nameAr:'مواصلات',  icon:'🚗', color:'#3b82f6'},
+  {name:'Shopping',nameAr:'تسوق',      icon:'🛍️', color:'#a855f7'},
+  {name:'Entertainment',nameAr:'ترفيه',icon:'🎮', color:'#6366f1'},
+  {name:'Bills',   nameAr:'فواتير',    icon:'⚡', color:'#f59e0b'},
+  {name:'Health',  nameAr:'صحة',       icon:'💊', color:'#10b981'},
+  {name:'Education',nameAr:'تعليم',    icon:'📚', color:'#0ea5e9'},
+  {name:'Housing', nameAr:'سكن',       icon:'🏠', color:'#f97316'},
+  {name:'Other',   nameAr:'أخرى',      icon:'📌', color:'#8e929a'}
 ];
 const CAT_MAP={};CATS.forEach(c=>CAT_MAP[c.name]=c);
 
+// ── I18N ─────────────────────────────────────────────────────
+const T={
+  en:{
+    appName:'Good Morning',
+    spending:'TOTAL BALANCE',
+    expenses:'Total Expenses',
+    dailyAvg:'Daily Average',
+    recent:'Recent Transactions',
+    desc:'Description',
+    descPlaceholder:'e.g. Uber, pizza, rent...',
+    amount:'Amount',category:'Category',date:'Date',
+    addBtn:'ADD EXPENSE',
+    fillError:'⚠ Fill description & amount',
+    added:'✓ Added Successfully!',
+    importError:'⚠ No valid rows found in CSV',
+    importSuccess:(n)=>`✓ Imported ${n} expenses`,
+    export:'EXPORT CSV',import:'IMPORT CSV',
+    allTime:'All Time',
+    breakdown:'Spending breakdown',
+    leaks:'Money leak insights',
+    noExpenses:'No expenses yet.\nTap + to add your first one.',
+    noFilter:'No expenses found.',
+    noLeaks:'Add expenses to see your money leaks.',
+    balanced:'Your spending looks balanced this month. Keep tracking to spot trends over time.',
+    aboutTitle:'Masrofy',
+    aboutTagline:'Your personal money leak detector',
+    whatTitle:'What is Masrofy?',
+    whatText:'Masrofy (مصروفي) means "my expenses" in Arabic. It\'s a simple, offline-first expense tracker designed to help you understand where your money actually goes — and spot the leaks before they drain you.',
+    featuresTitle:'Features',
+    features:['Track daily expenses by category','Visual spending breakdown & insights','Export & import data as CSV','Works offline — your data stays on your device','Arabic & English language support','Installable as a mobile app (PWA)'],
+    neonSub:'Built with craft & curiosity',
+    neonDesc:'Masrofy is a product of Neon Studios — a creative digital studio focused on building tools that are purposeful, beautiful, and fast.',
+    navHome:'Home',navAdd:'Add',navList:'History',navInsights:'Insights',navAbout:'Menu',
+    catMonth:'Statistics',
+  },
+  ar:{
+    appName:'صباح الخير',
+    spending:'إجمالي الرصيد',
+    expenses:'إجمالي المصروفات',
+    dailyAvg:'المتوسط اليومي',
+    recent:'المعاملات الأخيرة',
+    desc:'الوصف',
+    descPlaceholder:'مثال: أوبر، بيتزا، إيجار...',
+    amount:'المبلغ',category:'الفئة',date:'التاريخ',
+    addBtn:'أضف مصروف',
+    fillError:'⚠ أدخل الوصف والمبلغ',
+    added:'✓ تمت الإضافة بنجاح!',
+    importError:'⚠ لم يتم العثور على بيانات صالحة في الملف',
+    importSuccess:(n)=>`✓ تم استيراد ${n} مصروف`,
+    export:'تصدير CSV',import:'استيراد CSV',
+    allTime:'كل الوقت',
+    breakdown:'تفصيل الإنفاق',
+    leaks:'رصد تسرب المال',
+    noExpenses:'لا مصروفات حتى الآن.\nاضغط + لإضافة أول واحدة.',
+    noFilter:'لا توجد مصروفات مطابقة.',
+    noLeaks:'أضف مصروفات لترى تحليل إنفاقك.',
+    balanced:'إنفاقك متوازن هذا الشهر. استمر في التتبع لاكتشاف الأنماط.',
+    aboutTitle:'مصروفي',
+    aboutTagline:'كاشف تسرب المال الشخصي',
+    whatTitle:'ما هو مصروفي؟',
+    whatText:'مصروفي هو تطبيق بسيط لتتبع المصروفات الشخصية، مصمم ليساعدك على فهم أين يذهب مالك فعلاً — وتحديد نقاط التسرب قبل أن تستنزفك.',
+    featuresTitle:'المميزات',
+    features:['تتبع المصروفات اليومية حسب الفئة','تحليل بصري للإنفاق مع رؤى ذكية','تصدير واستيراد البيانات بصيغة CSV','يعمل بدون إنترنت — بياناتك على جهازك','دعم اللغتين العربية والإنجليزية','قابل للتثبيت كتطبيق على الهاتف (PWA)'],
+    neonSub:'صُنع بإتقان وشغف',
+    neonDesc:'مصروفي من إنتاج Neon Studios — استوديو رقمي إبداعي متخصص في بناء أدوات هادفة وجميلة وسريعة.',
+    navHome:'الرئيسية',navAdd:'إضافة',navList:'السجل',navInsights:'تحليل',navAbout:'القائمة',
+    catMonth:'الإحصائيات',
+  }
+};
+
+let lang=localStorage.getItem('masrofy-lang')||'en';
 let expenses=JSON.parse(localStorage.getItem('masrofy')||'[]');
 let selCat=CATS[0].name;
 let filterCat='all';
 
+function t(key,...args){
+  const val=T[lang][key];
+  return typeof val==='function'?val(...args):val;
+}
+
+function setLang(l){
+  lang=l;
+  localStorage.setItem('masrofy-lang',l);
+  const body=document.body;
+  if(l==='ar'){
+    body.classList.add('ar');
+    body.setAttribute('dir','rtl');
+    document.documentElement.setAttribute('lang','ar');
+  } else {
+    body.classList.remove('ar');
+    body.setAttribute('dir','ltr');
+    document.documentElement.setAttribute('lang','en');
+  }
+  document.getElementById('btn-en').classList.toggle('active',l==='en');
+  document.getElementById('btn-ar').classList.toggle('active',l==='ar');
+  applyTranslations();
+  buildCatGrid();
+  updateAll();
+  renderList();
+}
+
+function applyTranslations(){
+  const s=(id,key)=>{const el=document.getElementById(id);if(el)el.textContent=t(key);};
+  s('lbl-app-name','appName');
+  s('lbl-this-month-spending','spending');
+  s('lbl-expenses','expenses');
+  s('lbl-daily-avg','dailyAvg');
+  s('lbl-recent','recent');
+  s('lbl-desc','desc');
+  document.getElementById('f-desc').placeholder=t('descPlaceholder');
+  s('lbl-amount','amount');
+  s('lbl-category','category');
+  s('lbl-date','date');
+  document.getElementById('add-btn').textContent=t('addBtn');
+  s('lbl-export','export');
+  s('lbl-import','import');
+  s('lbl-spending-breakdown','breakdown');
+  s('lbl-money-leaks','leaks');
+  s('nav-lbl-home','navHome');
+  s('nav-lbl-add','navAdd');
+  s('nav-lbl-list','navList');
+  s('nav-lbl-insights','navInsights');
+  s('nav-lbl-about','navAbout');
+  s('about-app-name','aboutTitle');
+  s('about-tagline','aboutTagline');
+  s('about-what-title','whatTitle');
+  s('about-what-text','whatText');
+  s('about-features-title','featuresTitle');
+  const feats=document.querySelectorAll('#about-features li');
+  const fArr=T[lang].features;
+  feats.forEach((el,i)=>{if(fArr[i])el.textContent=fArr[i];});
+  s('neon-sub','neonSub');
+  s('neon-desc','neonDesc');
+}
+
+// ── UTILS ────────────────────────────────────────────────────
 function save(){localStorage.setItem('masrofy',JSON.stringify(expenses));}
-function fmt(n){return 'EGP '+Math.round(n).toLocaleString('en');}
-function fmtShort(n){if(n>=1000)return 'EGP '+(n/1000).toFixed(1)+'k';return fmt(n);}
+function fmt(n){return '$'+n.toLocaleString('en', {minimumFractionDigits: 2, maximumFractionDigits: 2});}
+function fmtShort(n){if(n>=1000)return '$'+(n/1000).toFixed(1)+'k';return '$'+Math.round(n).toLocaleString('en');}
 function getMonthKey(d){const dt=new Date(d);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');}
 function currentMonth(){const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');}
-function monthLabel(k){if(!k)return '';const [y,m]=k.split('-');const d=new Date(y,m-1,1);return d.toLocaleString('en',{month:'short',year:'numeric'}).toUpperCase();}
+function monthLabel(k){if(!k)return '';const [y,m]=k.split('-');const d=new Date(y,m-1,1);return d.toLocaleString(lang==='ar'?'ar-EG':'en',{month:'long',year:'numeric'});}
+function catLabel(c){return lang==='ar'&&c.nameAr?c.nameAr:c.name;}
 
+// ── CAT GRID ─────────────────────────────────────────────────
 function buildCatGrid(){
   const g=document.getElementById('cat-grid');
   g.innerHTML=CATS.map(c=>`<div class="cat-pill${c.name===selCat?' selected':''}" onclick="selectCat('${c.name}')">
-    <span class="cat-icon">${c.icon}</span>${c.name}
+    <span class="cat-icon">${c.icon}</span>${catLabel(c)}
   </div>`).join('');
 }
 function selectCat(n){selCat=n;buildCatGrid();}
 
+// ── ADD EXPENSE ───────────────────────────────────────────────
 function addExpense(){
   const desc=document.getElementById('f-desc').value.trim();
   const amount=parseFloat(document.getElementById('f-amount').value);
   const date=document.getElementById('f-date').value||new Date().toISOString().slice(0,10);
   if(!desc||!amount||amount<=0){
-    document.getElementById('flash').textContent='⚠ Fill description & amount';
+    document.getElementById('flash').textContent=t('fillError');
     setTimeout(()=>document.getElementById('flash').textContent='',2000);return;
   }
   expenses.push({id:Date.now(),desc,amount,cat:selCat,date});
   save();
   document.getElementById('f-desc').value='';
   document.getElementById('f-amount').value='';
-  document.getElementById('flash').textContent='✓ Added!';
+  document.getElementById('flash').textContent=t('added');
   setTimeout(()=>document.getElementById('flash').textContent='',1500);
   updateAll();
+  
+  setTimeout(() => switchPage('home'), 800);
 }
 
 function deleteExpense(id){
@@ -287,6 +602,64 @@ function deleteExpense(id){
   save();updateAll();renderList();
 }
 
+// ── EXPORT CSV ───────────────────────────────────────────────
+function exportCSV(){
+  const rows=[['Date','Description','Category','Amount'],
+    ...expenses.sort((a,b)=>new Date(b.date)-new Date(a.date))
+      .map(e=>[e.date,e.desc,e.cat,e.amount])];
+  const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='masrofy-expenses.csv';a.click();
+}
+
+// ── IMPORT CSV ───────────────────────────────────────────────
+function importCSV(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const text=e.target.result;
+    const lines=text.split('\n').map(l=>l.trim()).filter(Boolean);
+    let imported=0;
+    for(let i=1;i<lines.length;i++){
+      const cols=parseCSVLine(lines[i]);
+      if(cols.length<4)continue;
+      const date=cols[0]||new Date().toISOString().slice(0,10);
+      const desc=cols[1];
+      const cat=CAT_MAP[cols[2]]?cols[2]:'Other';
+      const amount=parseFloat(cols[3]);
+      if(!desc||isNaN(amount)||amount<=0)continue;
+      const dup=expenses.some(ex=>ex.date===date&&ex.desc===desc&&ex.amount===amount);
+      if(!dup){
+        expenses.push({id:Date.now()+imported,desc,amount,cat,date});
+        imported++;
+      }
+    }
+    save();updateAll();renderList();
+    const flash=document.getElementById('flash');
+    const msg=imported>0?t('importSuccess',imported):t('importError');
+    flash.textContent=msg;
+    setTimeout(()=>flash.textContent='',3000);
+    if(imported>0)switchPage('list');
+  };
+  reader.readAsText(file,'UTF-8');
+  event.target.value=''; 
+}
+
+function parseCSVLine(line){
+  const res=[];let cur='';let inQ=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch==='"'){inQ=!inQ;}
+    else if(ch===','&&!inQ){res.push(cur.trim());cur='';}
+    else cur+=ch;
+  }
+  res.push(cur.trim());
+  return res;
+}
+
+// ── RENDER ───────────────────────────────────────────────────
 function getCatTotals(list){
   const c={};list.forEach(e=>c[e.cat]=(c[e.cat]||0)+e.amount);
   return Object.entries(c).sort((a,b)=>b[1]-a[1]);
@@ -298,12 +671,10 @@ function updateAll(){
   const total=monthly.reduce((s,e)=>s+e.amount,0);
   document.getElementById('header-total').textContent=fmt(total);
   document.getElementById('month-badge').textContent=monthLabel(cm);
-  document.getElementById('m-month').textContent=fmtShort(total);
   document.getElementById('m-count').textContent=expenses.length;
   const days=new Date().getDate();
   document.getElementById('m-avg').textContent=fmtShort(days>0?total/days:0);
-  const tops=getCatTotals(monthly);
-  document.getElementById('m-top-cat').textContent=tops.length?tops[0][0]:'—';
+  
   renderHomeChart(monthly);
   renderRecent();
   renderInsights();
@@ -314,13 +685,13 @@ function renderHomeChart(monthly){
   if(!monthly.length){wrap.innerHTML='';return;}
   const cats=getCatTotals(monthly);
   const max=cats[0][1];
-  wrap.innerHTML='<div class="card-label">This month by category</div>'+cats.map(([cat,amt])=>{
+  wrap.innerHTML=`<div class="card-label" style="margin-top:10px;">${t('catMonth')}</div>`+cats.slice(0, 4).map(([cat,amt])=>{
     const c=CAT_MAP[cat];
     const pct=Math.round(amt/max*100);
     return `<div class="chart-bar-row">
-      <span class="chart-cat-label">${c?c.icon+' ':''}'${cat}'</span>
+      <span class="chart-cat-label">${c?catLabel(c):cat}</span>
       <div class="chart-bar-bg">
-        <div class="chart-bar-fill" style="width:${pct}%;background:${c?c.color:'#888'}">${pct>25?fmtShort(amt):''}</div>
+        <div class="chart-bar-fill" style="width:${pct}%;background:${c?c.color:'#888'}"></div>
       </div>
       <span class="chart-amt">${fmtShort(amt)}</span>
     </div>`;
@@ -330,16 +701,18 @@ function renderHomeChart(monthly){
 function renderRecent(){
   const el=document.getElementById('recent-list');
   const recent=expenses.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
-  if(!recent.length){el.innerHTML='<div class="empty"><div class="empty-icon">💸</div><div class="empty-text">No expenses yet.<br/>Tap + to add your first one.</div></div>';return;}
+  if(!recent.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">💸</div><div class="empty-text">${t('noExpenses')}</div></div>`;return;
+  }
   el.innerHTML=recent.map(e=>{
     const c=CAT_MAP[e.cat];
     return `<div class="expense-item">
-      <div class="exp-dot" style="background:${c?c.color:'#888'}"></div>
+      <div class="exp-icon" style="background:${c?c.color+'25':'#333'}; color:${c?c.color:'#fff'}">${c?c.icon:'📌'}</div>
       <div class="exp-body">
         <div class="exp-desc">${e.desc}</div>
-        <div class="exp-meta">${e.cat} · ${e.date}</div>
+        <div class="exp-meta">${c?catLabel(c):e.cat} · ${e.date}</div>
       </div>
-      <div class="exp-right"><div class="exp-amount">${fmt(e.amount)}</div></div>
+      <div class="exp-right"><div class="exp-amount">-${fmtShort(e.amount)}</div></div>
     </div>`;
   }).join('');
 }
@@ -348,25 +721,24 @@ function renderList(){
   const months=['all',...new Set(expenses.map(e=>getMonthKey(e.date))).values()].sort().reverse();
   if(months[0]==='all'&&months.length===1)months.push(currentMonth());
   const fb=document.getElementById('filter-bar');
-  fb.innerHTML=months.map(m=>`<div class="filter-chip${filterCat===m?' active':''}" onclick="setFilter('${m}')">${m==='all'?'All time':monthLabel(m)}</div>`).join('');
+  fb.innerHTML=months.map(m=>`<div class="filter-chip${filterCat===m?' active':''}" onclick="setFilter('${m}')">${m==='all'?t('allTime'):monthLabel(m)}</div>`).join('');
   let filtered=filterCat==='all'?expenses:expenses.filter(e=>getMonthKey(e.date)===filterCat);
   filtered=filtered.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
   const el=document.getElementById('expense-list');
-  if(!filtered.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">No expenses found.</div></div>';return;}
+  if(!filtered.length){el.innerHTML=`<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">${t('noFilter')}</div></div>`;return;}
   el.innerHTML=filtered.map(e=>{
     const c=CAT_MAP[e.cat];
     return `<div class="expense-item">
-      <div class="exp-dot" style="background:${c?c.color:'#888'}"></div>
+      <div class="exp-icon" style="background:${c?c.color+'25':'#333'}; color:${c?c.color:'#fff'}">${c?c.icon:'📌'}</div>
       <div class="exp-body">
         <div class="exp-desc">${e.desc}</div>
-        <div class="exp-meta">${e.cat} · ${e.date}</div>
+        <div class="exp-meta">${c?catLabel(c):e.cat} · ${e.date}</div>
       </div>
-      <div class="exp-right"><div class="exp-amount">${fmt(e.amount)}</div></div>
+      <div class="exp-right"><div class="exp-amount">-${fmtShort(e.amount)}</div></div>
       <button class="exp-delete" onclick="deleteExpense(${e.id})">✕</button>
     </div>`;
   }).join('');
 }
-
 function setFilter(m){filterCat=m;renderList();}
 
 function renderInsights(){
@@ -376,7 +748,7 @@ function renderInsights(){
   const lb=document.getElementById('leak-bars');
   const il=document.getElementById('insights-list');
   if(!monthly.length){
-    lb.innerHTML='<div class="empty"><div class="empty-icon">◎</div><div class="empty-text">Add expenses to see your money leaks.</div></div>';
+    lb.innerHTML=`<div class="empty"><div class="empty-icon">◎</div><div class="empty-text">${t('noLeaks')}</div></div>`;
     il.innerHTML='';return;
   }
   const cats=getCatTotals(monthly);
@@ -385,7 +757,7 @@ function renderInsights(){
     const c=CAT_MAP[cat];
     return `<div class="leak-row">
       <div class="leak-top">
-        <span class="leak-cat">${c?c.icon+' ':''}'${cat}'</span>
+        <span class="leak-cat"><span style="font-size:18px">${c?c.icon:''}</span> ${c?catLabel(c):cat}</span>
         <div class="leak-right"><div class="leak-pct">${pct}%</div><div class="leak-amt">${fmt(amt)}</div></div>
       </div>
       <div class="leak-track"><div class="leak-fill" style="width:${pct}%;background:${c?c.color:'#888'}"></div></div>
@@ -396,15 +768,27 @@ function renderInsights(){
   let insights=[];
   if(cats.length&&cats[0][1]/total>0.35){
     const [tc,ta]=cats[0];
-    insights.push({text:`<strong>${tc}</strong> is eating ${Math.round(ta/total*100)}% of your budget — that's ${fmt(ta)} this month. Setting a cap could save you ${fmt(ta*0.2)}/month.`,warn:true});
+    const tcObj=CAT_MAP[tc];
+    const tcLbl=tcObj?catLabel(tcObj):tc;
+    if(lang==='ar') insights.push({text:`<strong>${tcLbl}</strong> يستهلك ${Math.round(ta/total*100)}% من ميزانيتك — أي ${fmt(ta)} هذا الشهر. وضع سقف للإنفاق قد يوفر لك ${fmt(ta*0.2)} شهرياً.`,warn:true});
+    else insights.push({text:`<strong>${tcLbl}</strong> is eating ${Math.round(ta/total*100)}% of your budget — that's ${fmt(ta)} this month. Setting a cap could save you ${fmt(ta*0.2)}/month.`,warn:true});
   }
   const food=catMap['Food']||0;
-  if(food/total>0.25)insights.push({text:`You spent <strong>${fmt(food)}</strong> on food this month (${Math.round(food/total*100)}%). Cooking at home 3x a week could cut this by up to 30%.`,warn:false});
+  if(food/total>0.25){
+    if(lang==='ar') insights.push({text:`أنفقت <strong>${fmt(food)}</strong> على الطعام هذا الشهر (${Math.round(food/total*100)}%). الطبخ المنزلي 3 مرات أسبوعياً قد يخفض هذا بنسبة 30%.`,warn:false});
+    else insights.push({text:`You spent <strong>${fmt(food)}</strong> on food this month (${Math.round(food/total*100)}%). Cooking at home 3x a week could cut this by up to 30%.`,warn:false});
+  }
   const shop=catMap['Shopping']||0;
-  if(shop/total>0.2)insights.push({text:`<strong>Shopping</strong> is ${Math.round(shop/total*100)}% of spending. Try the 48-hour rule — wait 2 days before any non-essential purchase.`,warn:true});
+  if(shop/total>0.2){
+    if(lang==='ar') insights.push({text:`<strong>التسوق</strong> يمثل ${Math.round(shop/total*100)}% من إنفاقك. جرب قاعدة 48 ساعة — انتظر يومين قبل أي شراء غير ضروري.`,warn:true});
+    else insights.push({text:`<strong>Shopping</strong> is ${Math.round(shop/total*100)}% of spending. Try the 48-hour rule — wait 2 days before any non-essential purchase.`,warn:true});
+  }
   const ent=catMap['Entertainment']||0;
-  if(ent/total>0.15)insights.push({text:`Entertainment costs: <strong>${fmt(ent)}</strong>. Review your subscriptions — unused ones are silent leaks.`,warn:false});
-  if(!insights.length)insights.push({text:'Your spending looks balanced this month. Keep tracking to spot trends over time.',warn:false});
+  if(ent/total>0.15){
+    if(lang==='ar') insights.push({text:`مصاريف الترفيه: <strong>${fmt(ent)}</strong>. راجع اشتراكاتك — الغير مستخدمة منها تسرب صامت.`,warn:false});
+    else insights.push({text:`Entertainment costs: <strong>${fmt(ent)}</strong>. Review your subscriptions — unused ones are silent leaks.`,warn:false});
+  }
+  if(!insights.length)insights.push({text:t('balanced'),warn:false});
   il.innerHTML=insights.map(i=>`<div class="insight-card${i.warn?' warn':''}">${i.text}</div>`).join('');
 }
 
@@ -418,49 +802,40 @@ function switchPage(p){
   if(p==='insights')renderInsights();
 }
 
-function exportCSV(){
-  const rows=[['Date','Description','Category','Amount (EGP)'],...expenses.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(e=>[e.date,e.desc,e.cat,e.amount])];
-  const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
-  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);a.download='masrofy-expenses.csv';a.click();
-}
-
-// Init
+// ── INIT ─────────────────────────────────────────────────────
 document.getElementById('f-date').value=new Date().toISOString().slice(0,10);
+applyTheme(currentTheme); 
+setLang(lang);
 buildCatGrid();
 updateAll();
 </script>
 
-<!-- PWA Service Worker Registration -->
 <script>
 if('serviceWorker' in navigator){
   const sw=`
-    const CACHE='masrofy-v1';
+    const CACHE='masrofy-v2';
     const FILES=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES))));
     self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
   `;
   const blob=new Blob([sw],{type:'application/javascript'});
-  const url=URL.createObjectURL(blob);
-  navigator.serviceWorker.register(url).catch(()=>{});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
 }
 </script>
 
-<!-- PWA Manifest injection -->
 <script>
 const manifest={
   name:'Masrofy — مصروفي',short_name:'Masrofy',
   description:'Personal expense tracker',
   start_url:'.',display:'standalone',
-  background_color:'#0f0f0f',theme_color:'#0f0f0f',
+  background_color:'#0b0c10',theme_color:'#0b0c10',
   orientation:'portrait',
   icons:[
-    {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230f0f0f'/%3E%3Ctext x='96' y='130' text-anchor='middle' font-size='100' font-family='monospace' fill='%23c8f55a'%3E₪%3C/text%3E%3C/svg%3E",sizes:'192x192',type:'image/svg+xml'},
-    {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230f0f0f'/%3E%3Ctext x='256' y='360' text-anchor='middle' font-size='280' font-family='monospace' fill='%23c8f55a'%3E₪%3C/text%3E%3C/svg%3E",sizes:'512x512',type:'image/svg+xml'}
+    {src:"logo.svg", sizes:'any', type:'image/svg+xml'}
   ]
 };
 const mblob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
-const murl=URL.createObjectURL(mblob);
-const link=document.createElement('link');link.rel='manifest';link.href=murl;document.head.appendChild(link);
+const link=document.createElement('link');link.rel='manifest';link.href=URL.createObjectURL(mblob);document.head.appendChild(link);
 </script>
 </body>
 </html>
