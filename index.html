@@ -77,7 +77,8 @@ body.ar .app-name { letter-spacing: 0; font-size: 14px; }
 body.ar .lang-btn { font-family: var(--font-ar); }
 
 /* HERO CARD (BALANCE) */
-.balance-card { background: var(--accent-grad); border-radius: var(--radius); padding: 24px; position: relative; overflow: hidden; box-shadow: 0 12px 30px rgba(139, 195, 74, 0.15); margin-bottom: 8px; }
+.balance-card { background: var(--accent-grad); border-radius: var(--radius); padding: 24px; position: relative; overflow: hidden; box-shadow: 0 12px 30px rgba(139, 195, 74, 0.15); margin-bottom: 8px; transition: opacity 0.3s, transform 0.3s, margin 0.3s; transform-origin: top; }
+.balance-card.hide { display: none; }
 .balance-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
 .total-label { font-size: 13px; color: rgba(0,0,0,0.6); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
 .total-display { font-size: 40px; font-weight: 700; color: #0b0c10; letter-spacing: -0.02em; line-height: 1; margin-bottom: 16px; }
@@ -85,7 +86,7 @@ body.ar .lang-btn { font-family: var(--font-ar); }
 .spent-info { display: flex; flex-direction: column; color: #0b0c10; }
 .spent-lbl { font-size: 11px; opacity: 0.7; font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
 .spent-val { font-size: 16px; font-weight: 700; }
-.edit-balance-btn { background: rgba(0,0,0,0.1); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 16px; }
+.edit-balance-btn { background: rgba(0,0,0,0.1); color: #0b0c10; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
 .edit-balance-btn:active { transform: scale(0.9); background: rgba(0,0,0,0.2); }
 
 /* SCROLL AREA */
@@ -150,11 +151,9 @@ body.ar .add-btn { font-family: var(--font-ar); letter-spacing: 0; }
 
 /* CAT PILLS */
 .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-/* Updated border to 2px to ensure the box size doesn't jump, and padding slightly adjusted */
 .cat-pill { padding: 13px 8px; background: var(--bg2); border: 2px solid transparent; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; text-align: center; cursor: pointer; transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s, border-color 0.2s, box-shadow 0.2s; color: var(--text2); }
 [data-theme="light"] .cat-pill { border-color: var(--border); }
 .cat-pill:active { transform: scale(0.90); opacity: 0.8; }
-/* Clear stroke & glow for selected item */
 .cat-pill.selected { background: rgba(139, 195, 74, 0.1); border: 2px solid var(--accent); color: var(--accent); box-shadow: 0 0 0 2px rgba(139, 195, 74, 0.25); }
 .cat-pill .cat-icon { font-size: 24px; display: block; margin-bottom: 6px; }
 
@@ -246,6 +245,20 @@ body.ar .feature-list li { flex-direction: row-reverse; text-align: right; }
 .neon-desc { font-size: 13px; color: var(--text2); margin-top: 12px; line-height: 1.6; }
 .version-badge { display: inline-block; margin-top: 20px; padding: 6px 14px; background: var(--bg); border-radius: 100px; font-size: 12px; font-weight: 600; color: var(--text3); }
 
+/* CUSTOM MODAL */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.modal-overlay.show { opacity: 1; pointer-events: auto; }
+.modal-card { background: var(--bg2); width: 90%; max-width: 320px; border-radius: var(--radius); padding: 24px; border: 1px solid var(--border); transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+[data-theme="light"] .modal-card { box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+.modal-overlay.show .modal-card { transform: translateY(0); }
+.modal-card h3 { margin-bottom: 16px; font-size: 18px; color: var(--text); }
+.modal-actions { display: flex; gap: 10px; }
+.modal-btn { flex: 1; padding: 14px; border-radius: 100px; font-weight: 600; font-family: var(--font-en); font-size: 14px; cursor: pointer; transition: transform 0.15s, opacity 0.15s; border: none; }
+body.ar .modal-btn { font-family: var(--font-ar); }
+.modal-btn:active { transform: scale(0.95); }
+.modal-btn.cancel { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+.modal-btn.save { background: var(--accent-grad); color: #000; box-shadow: 0 4px 12px rgba(139, 195, 74, 0.2); }
+
 /* RTL support */
 body.ar .header-top { flex-direction: row-reverse; }
 body.ar .user-info { flex-direction: row-reverse; }
@@ -260,6 +273,20 @@ body.ar .leak-cat { flex-direction: row-reverse; }
 <body>
 
 <div id="toast" class="toast">✓ Added</div>
+
+<div id="balance-modal" class="modal-overlay">
+  <div class="modal-card">
+    <h3 id="lbl-edit-balance-title">Edit Balance</h3>
+    <div class="amount-wrap" style="margin-top: 16px; margin-bottom: 24px;">
+      <span class="currency">EGP</span>
+      <input type="number" id="m-balance-input" inputmode="decimal" step="0.01" />
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeBalanceModal()" id="lbl-cancel">Cancel</button>
+      <button class="modal-btn save" onclick="saveBalanceModal()" id="lbl-save">Save</button>
+    </div>
+  </div>
+</div>
 
 <div class="header">
   <div class="header-top">
@@ -279,7 +306,7 @@ body.ar .leak-cat { flex-direction: row-reverse; }
     </div>
   </div>
 
-  <div class="balance-card">
+  <div class="balance-card" id="hero-balance-card">
     <div class="total-label" id="lbl-current-balance">CURRENT BALANCE</div>
     <div class="total-display" id="header-balance">0</div>
     <div class="card-bottom-row">
@@ -287,7 +314,12 @@ body.ar .leak-cat { flex-direction: row-reverse; }
           <span class="spent-lbl" id="lbl-spent-month">Spent this month</span>
           <span class="spent-val" id="header-spent">0</span>
        </div>
-       <button class="edit-balance-btn" onclick="promptSetBalance()">✏️</button>
+       <button class="edit-balance-btn" onclick="openBalanceModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+       </button>
     </div>
   </div>
 </div>
@@ -376,7 +408,14 @@ body.ar .leak-cat { flex-direction: row-reverse; }
       <div class="add-form" style="padding: 0; background: var(--bg2); border-radius: var(--radius-sm); border: 1px solid var(--border); overflow: hidden;">
         <div class="field" style="margin: 0; padding: 16px;">
           <label id="lbl-pref-currency">Currency Symbol</label>
-          <input type="text" id="f-currency" placeholder="EGP, $, €, etc." onchange="updateCurrency(this.value)" autocomplete="off" maxlength="4"/>
+          <select id="f-currency" onchange="updateCurrency(this.value)">
+            <option value="EGP">EGP (E£)</option>
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+            <option value="SAR">SAR (﷼)</option>
+            <option value="AED">AED (د.إ)</option>
+          </select>
         </div>
       </div>
     </div>
@@ -418,35 +457,35 @@ body.ar .leak-cat { flex-direction: row-reverse; }
 
 <nav class="bottom-nav">
   <button class="nav-btn active" id="nav-home" onclick="switchPage('home')">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>
     </svg>
     <span id="nav-lbl-home">Home</span>
   </button>
   
   <button class="nav-btn" id="nav-insights" onclick="switchPage('insights')">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line>
     </svg>
     <span id="nav-lbl-insights">Insights</span>
   </button>
   
   <button class="nav-btn center-fab" id="nav-add" onclick="switchPage('add')">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
     </svg>
     <span id="nav-lbl-add">Add</span>
   </button>
   
   <button class="nav-btn" id="nav-list" onclick="switchPage('list')">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
     </svg>
     <span id="nav-lbl-list">History</span>
   </button>
   
   <button class="nav-btn" id="nav-settings" onclick="switchPage('settings')">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
     </svg>
     <span id="nav-lbl-settings">Settings</span>
@@ -483,7 +522,11 @@ function toggleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
 function updateCurrency(val) {
   currentCurrency = val.trim() || 'EGP';
   localStorage.setItem('masrofy-currency', currentCurrency);
-  document.querySelector('.amount-wrap .currency').textContent = currentCurrency;
+  
+  // Update all currency labels across the app
+  document.querySelectorAll('.amount-wrap .currency').forEach(el => {
+    el.textContent = currentCurrency;
+  });
   updateAll();
   renderList();
 }
@@ -508,7 +551,9 @@ const T={
     appName:'Good Morning',
     currentBalance:'CURRENT BALANCE',
     spentMonth:'Spent this month',
-    setBalancePrompt:'Enter your current wallet balance:',
+    editBalanceTitle:'Edit Balance',
+    cancel:'Cancel',
+    save:'Save',
     quickAdd:'Quick Add',
     expenses:'Total Expenses',
     dailyAvg:'Daily Average',
@@ -546,7 +591,9 @@ const T={
     appName:'صباح الخير',
     currentBalance:'الرصيد الحالي',
     spentMonth:'صُرف هذا الشهر',
-    setBalancePrompt:'أدخل رصيد محفظتك الحالي:',
+    editBalanceTitle:'تعديل الرصيد',
+    cancel:'إلغاء',
+    save:'حفظ',
     quickAdd:'إضافة سريعة',
     expenses:'إجمالي المصروفات',
     dailyAvg:'المتوسط اليومي',
@@ -578,7 +625,7 @@ const T={
     navHome:'الرئيسية',navAdd:'إضافة',navList:'السجل',navInsights:'تحليل',navSettings:'الإعدادات',
     catMonth:'الإحصائيات',
     preferences:'التفضيلات',
-    prefCurrency:'رمز العملة'
+    prefCurrency:'العملة'
   }
 };
 
@@ -613,6 +660,9 @@ function applyTranslations(){
   s('lbl-app-name','appName');
   s('lbl-current-balance','currentBalance');
   s('lbl-spent-month','spentMonth');
+  s('lbl-edit-balance-title','editBalanceTitle');
+  s('lbl-cancel','cancel');
+  s('lbl-save','save');
   s('lbl-quick-add','quickAdd');
   s('lbl-expenses','expenses');
   s('lbl-daily-avg','dailyAvg');
@@ -672,14 +722,25 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// ── BALANCE SYSTEM ───────────────────────────────────────────
-function promptSetBalance() {
-  let val = prompt(t('setBalancePrompt'), currentWalletBalance);
-  if (val !== null && !isNaN(parseFloat(val))) {
-    currentWalletBalance = parseFloat(val);
+// ── CUSTOM BALANCE MODAL ─────────────────────────────────────
+function openBalanceModal() {
+  document.getElementById('m-balance-input').value = currentWalletBalance;
+  document.getElementById('balance-modal').classList.add('show');
+  document.getElementById('m-balance-input').focus();
+}
+
+function closeBalanceModal() {
+  document.getElementById('balance-modal').classList.remove('show');
+}
+
+function saveBalanceModal() {
+  const val = parseFloat(document.getElementById('m-balance-input').value);
+  if (!isNaN(val)) {
+    currentWalletBalance = val;
     localStorage.setItem('masrofy-balance', currentWalletBalance);
     updateAll();
   }
+  closeBalanceModal();
 }
 
 // ── CAT GRID ─────────────────────────────────────────────────
@@ -968,6 +1029,15 @@ function switchPage(p){
   document.getElementById('page-'+p).classList.add('active');
   document.getElementById('nav-'+p).classList.add('active');
   document.getElementById('scroll-area').scrollTop=0;
+  
+  // Hide Hero Balance Card explicitly on the 'Add' Page
+  const heroCard = document.getElementById('hero-balance-card');
+  if (p === 'add') {
+    heroCard.classList.add('hide');
+  } else {
+    heroCard.classList.remove('hide');
+  }
+
   if(p==='list')renderList();
   if(p==='insights')renderInsights();
 }
@@ -975,7 +1045,7 @@ function switchPage(p){
 // ── INIT ─────────────────────────────────────────────────────
 document.getElementById('f-date').value=new Date().toISOString().slice(0,10);
 document.getElementById('f-currency').value=currentCurrency;
-document.querySelector('.amount-wrap .currency').textContent=currentCurrency;
+document.querySelectorAll('.amount-wrap .currency').forEach(el => el.textContent = currentCurrency);
 
 applyTheme(currentTheme); 
 setLang(lang);
