@@ -137,17 +137,19 @@ body.ar .qa-btn { text-align: right; }
 .field { margin-bottom: 14px; }
 .field label { display: block; font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
 
-/* Shared input styles including the modal balance input */
+/* Shared input styles */
 .field input, .field select, #m-balance-input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; color: var(--text); font-family: var(--font-en); font-size: 16px; outline: none; transition: all 0.2s; -webkit-appearance: none; box-sizing: border-box; }
 body.ar .field input, body.ar .field select, body.ar #m-balance-input { font-family: var(--font-ar); }
 .field input:focus, .field select:focus, #m-balance-input:focus { border-color: var(--accent); background: var(--bg3); }
 
 /* Amount input needs specific padding to make room for currency symbol */
 .amount-wrap { position: relative; }
-.amount-wrap .currency { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text2); font-size: 16px; font-weight: 500; }
+.amount-wrap .currency { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text2); font-size: 16px; font-weight: 500; z-index: 1;}
 body.ar .amount-wrap .currency { left: auto; right: 16px; }
-.amount-wrap input { padding-left: 60px; font-size: 20px; font-weight: 600; }
-body.ar .amount-wrap input { padding-left: 14px; padding-right: 60px; }
+
+/* FIXED PADDING FOR ALL AMOUNT INPUTS INCLUDING MODAL */
+.amount-wrap input[type="number"] { padding-left: 70px !important; font-size: 20px; font-weight: 600; }
+body.ar .amount-wrap input[type="number"] { padding-left: 14px !important; padding-right: 70px !important; }
 
 .add-btn { width: 100%; padding: 18px; background: var(--accent-grad); color: #0b0c10; border: none; border-radius: 100px; font-family: var(--font-en); font-size: 15px; font-weight: 600; letter-spacing: 0.05em; cursor: pointer; transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin-top: 10px; box-shadow: 0 8px 24px rgba(139, 195, 74, 0.2); }
 body.ar .add-btn { font-family: var(--font-ar); letter-spacing: 0; }
