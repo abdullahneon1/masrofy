@@ -11,6 +11,7 @@
 <meta name="description" content="Personal expense tracker - find your money leaks"/>
 <title>Masrofy — مصروفي</title>
 <link rel="icon" type="image/svg+xml" href="logo.svg" />
+<link rel="apple-touch-icon" href="logo-192.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
@@ -842,18 +843,23 @@ function importCSV(event){
   const file=event.target.files[0];
   if(!file)return;
   const reader=new FileReader();
+  
   reader.onload=function(e){
     const text=e.target.result;
-    const lines=text.split('\n').map(l=>l.trim()).filter(Boolean);
+    const lines=text.split(/\r\n|\n|\r/).map(l=>l.trim()).filter(Boolean);
     let imported=0;
+    
     for(let i=1;i<lines.length;i++){
       const cols=parseCSVLine(lines[i]);
       if(cols.length<4)continue;
+      
       const date=cols[0]||new Date().toISOString().slice(0,10);
       const desc=cols[1];
       const cat=CAT_MAP[cols[2]]?cols[2]:'Other';
-      const amount=parseFloat(cols[3]);
+      const amount=parseFloat(cols[3].replace(/,/g, ''));
+      
       if(!desc||isNaN(amount)||amount<=0)continue;
+      
       const dup=expenses.some(ex=>ex.date===date&&ex.desc===desc&&ex.amount===amount);
       if(!dup){
         expenses.push({id:Date.now()+imported,desc,amount,cat,date});
@@ -861,14 +867,22 @@ function importCSV(event){
         imported++;
       }
     }
+    
     localStorage.setItem('masrofy-balance', currentWalletBalance);
-    save();updateAll();renderList();
-    const flash=document.getElementById('flash');
-    const msg=imported>0?t('importSuccess',imported):t('importError');
-    flash.textContent=msg;
-    setTimeout(()=>flash.textContent='',3000);
-    if(imported>0)switchPage('list');
+    save();
+    updateAll();
+    renderList();
+    
+    const msg = imported > 0 ? t('importSuccess', imported) : t('importError');
+    showToast(msg);
+    
+    if(imported>0) switchPage('list');
   };
+  
+  reader.onerror = function() {
+    showToast("Error reading file.");
+  };
+  
   reader.readAsText(file,'UTF-8');
   event.target.value=''; 
 }
@@ -1107,7 +1121,9 @@ const manifest={
   background_color:'#0b0c10',theme_color:'#0b0c10',
   orientation:'portrait',
   icons:[
-    {src:"logo.svg", sizes:'any', type:'image/svg+xml'}
+    {src:"logo.svg", sizes:'any', type:'image/svg+xml'},
+    {src:"logo-192.png", sizes:"192x192", type:"image/png"},
+    {src:"logo-512.png", sizes:"512x512", type:"image/png"}
   ]
 };
 const mblob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
