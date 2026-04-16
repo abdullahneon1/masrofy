@@ -514,6 +514,32 @@ let currentWalletBalance = parseFloat(localStorage.getItem('masrofy-balance') ||
 let selCat = 'Food';
 let filterCat = 'all';
 
+// ── HANDLE SHARED TEXT (WEB SHARE TARGET API) ────────────────
+function handleSharedData() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedText = urlParams.get('text') || urlParams.get('title');
+
+  if (sharedText) {
+    // Clean up URL so it doesn't re-trigger on refresh
+    window.history.replaceState({}, document.title, window.location.pathname);
+
+    // Regex to find amounts (e.g. 150.00, 1,000, 50)
+    const amountMatch = sharedText.match(/[0-9,]+(\.\d{1,2})?/);
+    const amount = amountMatch ? parseFloat(amountMatch[0].replace(/,/g, '')) : '';
+
+    if (amount) {
+      document.getElementById('f-amount').value = amount;
+    }
+    
+    // Put the raw text as description so user can easily edit/delete
+    document.getElementById('f-desc').value = sharedText.substring(0, 40) + (sharedText.length > 40 ? '...' : '');
+
+    // Auto-switch to the Add page
+    switchPage('add');
+    showToast("Data imported from share!");
+  }
+}
+
 // ── THEME (DARK / LIGHT MODE) ────────────────────────────────
 function applyTheme(t) {
   currentTheme = t;
@@ -1064,6 +1090,7 @@ applyTheme(currentTheme);
 setLang(lang);
 buildCatGrid();
 updateAll();
+handleSharedData(); // Checks if app was opened via native sharing
 </script>
 
 <script>
@@ -1088,7 +1115,16 @@ const manifest={
   orientation:'portrait',
   icons:[
     {src:"logo.svg", sizes:'any', type:'image/svg+xml'}
-  ]
+  ],
+  share_target: {
+    action: "/",
+    method: "GET",
+    params: {
+      title: "title",
+      text: "text",
+      url: "url"
+    }
+  }
 };
 const mblob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
 const link=document.createElement('link');link.rel='manifest';link.href=URL.createObjectURL(mblob);document.head.appendChild(link);
