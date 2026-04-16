@@ -89,12 +89,13 @@ body.ar .lang-btn { font-family: var(--font-ar); }
 .balance-card.hide { display: none; }
 .balance-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
 .total-label { font-size: 13px; color: rgba(0,0,0,0.6); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
-.total-display { font-size: 40px; font-weight: 700; color: #0b0c10; letter-spacing: -0.02em; line-height: 1; margin-bottom: 16px; }
+.balance-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.total-display { font-size: 40px; font-weight: 700; color: #0b0c10; letter-spacing: -0.02em; line-height: 1; }
 .card-bottom-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.08); padding: 10px 14px; border-radius: 12px; }
 .spent-info { display: flex; flex-direction: column; color: #0b0c10; }
 .spent-lbl { font-size: 11px; opacity: 0.7; font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
 .spent-val { font-size: 16px; font-weight: 700; }
-.edit-balance-btn { background: rgba(0,0,0,0.1); color: #0b0c10; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+.edit-balance-btn { background: rgba(0,0,0,0.1); color: #0b0c10; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
 .edit-balance-btn:active { transform: scale(0.9); background: rgba(0,0,0,0.2); }
 
 /* SCROLL AREA */
@@ -278,6 +279,7 @@ body.ar .modal-btn { font-family: var(--font-ar); }
 body.ar .header-top { flex-direction: row-reverse; }
 body.ar .user-info { flex-direction: row-reverse; }
 body.ar .controls-wrap { flex-direction: row-reverse; }
+body.ar .balance-wrap { flex-direction: row-reverse; }
 body.ar .card-bottom-row { flex-direction: row-reverse; }
 body.ar .spent-info { align-items: flex-end; }
 body.ar .qa-details { align-items: flex-end; }
@@ -329,18 +331,20 @@ body.ar .leak-cat { flex-direction: row-reverse; }
 
   <div class="balance-card" id="hero-balance-card">
     <div class="total-label" id="lbl-current-balance">CURRENT BALANCE</div>
-    <div class="total-display" id="header-balance">0</div>
+    <div class="balance-wrap">
+      <div class="total-display" id="header-balance">0</div>
+      <button class="edit-balance-btn" onclick="openBalanceModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+          <path d="M12 20h9"></path>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+        </svg>
+      </button>
+    </div>
     <div class="card-bottom-row">
        <div class="spent-info">
           <span class="spent-lbl" id="lbl-spent-month">Spent this month</span>
           <span class="spent-val" id="header-spent">0</span>
        </div>
-       <button class="edit-balance-btn" onclick="openBalanceModal()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
-            <path d="M12 20h9"></path>
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-          </svg>
-       </button>
     </div>
   </div>
 </div>
@@ -534,6 +538,32 @@ let expenses = JSON.parse(localStorage.getItem('masrofy') || '[]');
 let currentWalletBalance = parseFloat(localStorage.getItem('masrofy-balance') || '0');
 let selCat = 'Food';
 let filterCat = 'all';
+
+// ── HANDLE SHARED TEXT (WEB SHARE TARGET API) ────────────────
+function handleSharedData() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedText = urlParams.get('text') || urlParams.get('title');
+
+  if (sharedText) {
+    // Clean up URL so it doesn't re-trigger on refresh
+    window.history.replaceState({}, document.title, window.location.pathname);
+
+    // Regex to find amounts (e.g. 150.00, 1,000, 50)
+    const amountMatch = sharedText.match(/[0-9,]+(\.\d{1,2})?/);
+    const amount = amountMatch ? parseFloat(amountMatch[0].replace(/,/g, '')) : '';
+
+    if (amount) {
+      document.getElementById('f-amount').value = amount;
+    }
+    
+    // Put the raw text as description so user can easily edit/delete
+    document.getElementById('f-desc').value = sharedText.substring(0, 40) + (sharedText.length > 40 ? '...' : '');
+
+    // Auto-switch to the Add page
+    switchPage('add');
+    showToast("Data imported from share!");
+  }
+}
 
 // ── THEME (DARK / LIGHT MODE) ────────────────────────────────
 function applyTheme(t) {
@@ -858,8 +888,6 @@ function importCSV(event){
       const date=cols[0]||new Date().toISOString().slice(0,10);
       const desc=cols[1];
       const cat=CAT_MAP[cols[2]]?cols[2]:'Other';
-      
-      // Remove any commas inside the amount number before parsing
       const amount=parseFloat(cols[3].replace(/,/g, ''));
       
       if(!desc||isNaN(amount)||amount<=0)continue;
@@ -1102,6 +1130,7 @@ applyTheme(currentTheme);
 setLang(lang);
 buildCatGrid();
 updateAll();
+handleSharedData(); // Checks if app was opened via native sharing
 </script>
 
 <script>
@@ -1128,7 +1157,16 @@ const manifest={
     {src:"logo.svg", sizes:'any', type:'image/svg+xml'},
     {src:"logo-192.png", sizes:"192x192", type:"image/png"},
     {src:"logo-512.png", sizes:"512x512", type:"image/png"}
-  ]
+  ],
+  share_target: {
+    action: "/",
+    method: "GET",
+    params: {
+      title: "title",
+      text: "text",
+      url: "url"
+    }
+  }
 };
 const mblob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
 const link=document.createElement('link');link.rel='manifest';link.href=URL.createObjectURL(mblob);document.head.appendChild(link);
